@@ -35,3 +35,16 @@ Database: PostgreSQL 17 in a container (`postgres:17-alpine`), memory limit 256 
 - cgroup memory limit: 268435456 bytes (= 256 MiB)
 - Parent process on the host: 20507 (runc is not running, because its work just to create container and get out then contained-shim maintain the container)
 - In one line: a container is just a normal process running inside the container but using nam space and cgroup it feel like it is isolated
+
+## Project 4: pinned and portable images
+
+| Image | Pinned digest |
+|---|---|
+| node:22-alpine | node@sha256:1314fb30ec37592d5845e5a160d522c0e680972aa534549940b8d73bde88481a|
+| postgres:17-alpine | postgres@sha256:d3244e8ce3f165ee3c93d9c4a4b1d0fe48b3a89e2287b717fdcbbde92d405065 |
+
+- The API now runs from: `node@sha256:1314fb30ec37592d5845e5a160d522c0e680972aa534549940b8d73bde88481a` (the value of {{.Config.Image}})
+- Why pin by digest: A tag can move to new content; a digest is calculated from the exact content, so every machine pulls the identical image.
+- Offline transfer: `docker save node:22-alpine postgres:17-alpine | gzip > shoplite-images.tar.gz` → 166 MB
+- Load on another machine: gunzip -c shoplite-images.tar.gz | docker load, the full command, so future-you can copy it
+- What fills the images (from `docker image history`):RUN … wget … postgresql (downloads and builds PostgreSQL) — 295 MB
