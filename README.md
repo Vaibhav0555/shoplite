@@ -48,3 +48,16 @@ Database: PostgreSQL 17 in a container (`postgres:17-alpine`), memory limit 256 
 - Offline transfer: `docker save node:22-alpine postgres:17-alpine | gzip > shoplite-images.tar.gz` → 166 MB
 - Load on another machine: gunzip -c shoplite-images.tar.gz | docker load, the full command, so future-you can copy it
 - What fills the images (from `docker image history`):RUN … wget … postgresql (downloads and builds PostgreSQL) — 295 MB
+
+## Project 5: Dockerfiles
+
+- `Dockerfile` (API): node:22-alpine pinned by digest, OCI labels, non-root (UID 1000), HEALTHCHECK on /health, exec-form CMD.
+- `frontend/Dockerfile`: nginx:alpine pinned by digest, serves index.html; inherits nginx's CMD and STOPSIGNAL.
+- Both pass `docker build --check` and hadolint with no findings.
+
+Build and run:
+
+    docker build -t shoplite-api:v5 .
+    docker build -t shoplite-web:v5 frontend
+    docker run -d --name shoplite-api --init -p 3000:3000 --memory 128m --cpus 0.5 --pids-limit 100 --restart unless-stopped shoplite-api:v5
+    docker run -d --name shoplite-web -p 8080:80 --memory 64m --cpus 0.5 --restart unless-stopped shoplite-web:v5
