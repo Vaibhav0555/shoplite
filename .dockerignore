@@ -1,0 +1,8 @@
+install-docker.sh
+ops.md
+README.md
+.git
+Dockerfile
+.dockerignore
+.env
+node_modulesfrontend
