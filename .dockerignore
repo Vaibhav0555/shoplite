@@ -5,4 +5,5 @@ README.md
 Dockerfile
 .dockerignore
 .env
-node_modulesfrontend
+node_modules
+frontend
